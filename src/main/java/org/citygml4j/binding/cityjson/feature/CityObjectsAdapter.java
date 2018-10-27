@@ -32,6 +32,10 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.Map.Entry;
+
 public class CityObjectsAdapter implements JsonSerializer<Map<String, AbstractCityObjectType>>, JsonDeserializer<Map<String, AbstractCityObjectType>> {
 
 	@Override

@@ -18,13 +18,6 @@
  */
 package handling_ade.ade_context.reading_ade;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.ServiceLoader;
-
-import javax.xml.namespace.QName;
-
 import org.citygml4j.CityGMLContext;
 import org.citygml4j.builder.jaxb.CityGMLBuilder;
 import org.citygml4j.model.citygml.CityGML;
@@ -38,6 +31,12 @@ import org.citygml4j.model.module.ade.ADEModule;
 import org.citygml4j.xml.io.CityGMLInputFactory;
 import org.citygml4j.xml.io.reader.CityGMLReader;
 import org.citygml4j.xml.io.reader.FeatureReadMode;
+
+import javax.xml.namespace.QName;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.ServiceLoader;
 
 public class ReadingADE {
 
