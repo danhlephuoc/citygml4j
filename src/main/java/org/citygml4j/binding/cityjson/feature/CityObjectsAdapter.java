@@ -18,10 +18,6 @@
  */
 package org.citygml4j.binding.cityjson.feature;
 
-import java.lang.reflect.Type;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -30,11 +26,22 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.internal.LinkedTreeMap;
+import org.citygml4j.binding.cityjson.CityJSONRegistry;
+
+import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class CityObjectsAdapter implements JsonSerializer<Map<String, AbstractCityObjectType>>, JsonDeserializer<Map<String, AbstractCityObjectType>> {
 
 	@Override
 	public JsonElement serialize(Map<String, AbstractCityObjectType> cityObjects, Type typeOfSrc, JsonSerializationContext context) {
+		CityJSONRegistry registry = CityJSONRegistry.getInstance();
+		for (AbstractCityObjectType cityObject : cityObjects.values()) {
+			if (cityObject.type == null)
+				cityObject.type = registry.getCityObjectType(cityObject);
+		}
+
 		return context.serialize(cityObjects);
 	}
 
@@ -47,8 +54,8 @@ public class CityObjectsAdapter implements JsonSerializer<Map<String, AbstractCi
 
 			AbstractCityObjectType cityObject = context.deserialize(object, AbstractCityObjectType.class);
 			if (cityObject != null) {
-				cityObject.gmlId = entry.getKey();					
-				cityObjects.put(cityObject.gmlId, cityObject);
+				cityObject.setGmlId(entry.getKey());
+				cityObjects.put(entry.getKey(), cityObject);
 			}
 		}
 

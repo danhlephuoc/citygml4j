@@ -76,9 +76,6 @@ public class TransportationUnmarshaller {
 	}
 
 	public void unmarshalSemantics(AbstractSemanticsObject src, Map<Integer, List<AbstractSurface>> surfaces, Number lod, AbstractCityObject parent) {
-		if (!(parent instanceof TransportationComplex))
-			return;
-		
 		for (int i = 0; i < src.getNumSurfaces(); i++) {
 			SemanticsType semanticsType = src.getSurfaces().get(i);
 			if (semanticsType == null)
@@ -88,22 +85,28 @@ public class TransportationUnmarshaller {
 			if (tmp == null || tmp.isEmpty())
 				continue;
 
-			AbstractTransportationObject traffixArea = null;
-			switch (semanticsType.getType()) {
-			case TRAFFIC_AREA:
-				traffixArea = unmarshalTrafficArea(semanticsType, tmp, lod);
-				break;
-			case AUXILIARY_TRAFFIC_AREA:
-				traffixArea = unmarshalAuxiliaryTrafficArea(semanticsType, tmp, lod);
-				break;
-			default:
-				continue;
-			}
+			if (semanticsType.getType().startsWith("+")) {
+				json.getADEUnmarshaller().unmarshalSemanticSurface(semanticsType, tmp, lod, parent);
+			} else {
+				AbstractTransportationObject traffixArea = null;
+				switch (semanticsType.getType()) {
+					case "TrafficArea":
+						traffixArea = unmarshalTrafficArea(semanticsType, tmp, lod);
+						break;
+					case "AuxiliaryTrafficArea":
+						traffixArea = unmarshalAuxiliaryTrafficArea(semanticsType, tmp, lod);
+						break;
+					default:
+						continue;
+				}
 
-			if (traffixArea instanceof TrafficArea)
-				((TransportationComplex)parent).addTrafficArea(new TrafficAreaProperty((TrafficArea)traffixArea));
-			else if (traffixArea instanceof AuxiliaryTrafficArea)
-				((TransportationComplex)parent).addAuxiliaryTrafficArea(new AuxiliaryTrafficAreaProperty((AuxiliaryTrafficArea)traffixArea));
+				if (parent instanceof TransportationComplex) {
+					if (traffixArea instanceof TrafficArea)
+						((TransportationComplex) parent).addTrafficArea(new TrafficAreaProperty((TrafficArea) traffixArea));
+					else if (traffixArea instanceof AuxiliaryTrafficArea)
+						((TransportationComplex) parent).addAuxiliaryTrafficArea(new AuxiliaryTrafficAreaProperty((AuxiliaryTrafficArea) traffixArea));
+				}
+			}
 		}
 	}
 

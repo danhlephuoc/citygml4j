@@ -68,9 +68,6 @@ public class WaterBodyUnmarshaller {
 	}
 	
 	public void unmarshalSemantics(AbstractSemanticsObject src, Map<Integer, List<AbstractSurface>> surfaces, Number lod, AbstractCityObject parent) {
-		if (!(parent instanceof WaterBody))
-			return;
-		
 		for (int i = 0; i < src.getNumSurfaces(); i++) {
 			SemanticsType semanticsType = src.getSurfaces().get(i);
 			if (semanticsType == null)
@@ -80,23 +77,27 @@ public class WaterBodyUnmarshaller {
 			if (tmp == null || tmp.isEmpty())
 				continue;
 
-			AbstractWaterBoundarySurface boundarySurface = null;
-			switch (semanticsType.getType()) {
-			case WATER_SURFACE:
-				boundarySurface = unmarshalWaterSurface(semanticsType, tmp, lod);
-				break;
-			case WATER_GROUND_SURFACE:
-				boundarySurface = unmarshalWaterGroundSurface(semanticsType, tmp, lod);
-				break;
-			case WATER_CLOSURE_SURFACE:
-				boundarySurface = unmarshalWaterClosureSurface(semanticsType, tmp, lod);
-				break;
-			default:
-				continue;
+			if (semanticsType.getType().startsWith("+")) {
+				json.getADEUnmarshaller().unmarshalSemanticSurface(semanticsType, tmp, lod, parent);
+			} else {
+				AbstractWaterBoundarySurface boundarySurface = null;
+				switch (semanticsType.getType()) {
+					case "WaterSurface":
+						boundarySurface = unmarshalWaterSurface(semanticsType, tmp, lod);
+						break;
+					case "WaterGroundSurface":
+						boundarySurface = unmarshalWaterGroundSurface(semanticsType, tmp, lod);
+						break;
+					case "WaterClosureSurface":
+						boundarySurface = unmarshalWaterClosureSurface(semanticsType, tmp, lod);
+						break;
+					default:
+						continue;
+				}
+
+				if (boundarySurface != null && parent instanceof WaterBody)
+					((WaterBody) parent).addBoundedBySurface(new BoundedByWaterSurfaceProperty(boundarySurface));
 			}
-			
-			if (boundarySurface != null)
-				((WaterBody)parent).addBoundedBySurface(new BoundedByWaterSurfaceProperty(boundarySurface));
 		}
 	}
 	

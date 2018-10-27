@@ -18,6 +18,7 @@
  */
 package org.citygml4j.binding.cityjson.feature;
 
+import com.google.gson.JsonElement;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
@@ -41,7 +42,9 @@ public class Attributes {
 	private String function;
 	private String usage;
 	private transient Map<String, Object> genericAttributes;
+	private transient Map<String, Object> ade;
 	private transient List<String> attributeNames;
+	transient Map<String, JsonElement> unknownProperties;
 
 	public boolean isSetCreationDate() {
 		return creationDate != null;
@@ -167,13 +170,42 @@ public class Attributes {
 		genericAttributes = null;
 	}
 
+	public boolean isSetGenericApplicationProperties() {
+		return ade != null;
+	}
+
+	public void addGenericApplicationProperty(String name, Object value) {
+		if (ade == null)
+			ade = new HashMap<>();
+
+		ade.put(name, value);
+	}
+
+	public Map<String, Object> getGenericApplicationProperties() {
+		return ade;
+	}
+
+	public void setGenericApplicationProperties(Map<String, Object> ade) {
+		this.ade = ade;
+	}
+
+	public void removeGenericApplicationProperty(String name) {
+		if (ade != null)
+			ade.remove(name);
+	}
+
+	public void unsetGenericApplicationProperties() {
+		ade = null;
+	}
+
 	public boolean hasAttributes() {
 		return creationDate != null
 				|| terminationDate != null
 				|| clazz != null
 				|| function!= null
 				|| usage != null
-				|| genericAttributes != null;
+				|| genericAttributes != null
+				|| ade != null;
 	}
 
 	protected List<String> getAttributeNames() {

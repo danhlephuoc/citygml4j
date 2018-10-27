@@ -18,11 +18,6 @@
  */
 package org.citygml4j.builder.cityjson.marshal.citygml.transportation;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 import org.citygml4j.binding.cityjson.feature.AbstractCityObjectType;
 import org.citygml4j.binding.cityjson.feature.AbstractTransportationComplexType;
 import org.citygml4j.binding.cityjson.feature.RailwayType;
@@ -31,7 +26,6 @@ import org.citygml4j.binding.cityjson.feature.TransportSquareType;
 import org.citygml4j.binding.cityjson.feature.TransportationComplexAttributes;
 import org.citygml4j.binding.cityjson.geometry.AbstractGeometryObjectType;
 import org.citygml4j.binding.cityjson.geometry.SemanticsType;
-import org.citygml4j.binding.cityjson.geometry.SemanticsTypeName;
 import org.citygml4j.builder.cityjson.marshal.CityJSONMarshaller;
 import org.citygml4j.builder.cityjson.marshal.citygml.CityGMLMarshaller;
 import org.citygml4j.builder.cityjson.marshal.util.SurfaceCollector;
@@ -54,6 +48,11 @@ import org.citygml4j.model.gml.geometry.aggregates.MultiSurfaceProperty;
 import org.citygml4j.model.gml.geometry.primitives.AbstractSurface;
 import org.citygml4j.model.gml.geometry.primitives.SurfaceProperty;
 import org.citygml4j.util.mapper.TypeMapper;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class TransportationMarshaller {
 	private final CityJSONMarshaller json;
@@ -78,10 +77,10 @@ public class TransportationMarshaller {
 		SemanticsType semantics = null;
 
 		if (cityObject instanceof TrafficArea) {
-			semantics = new SemanticsType(SemanticsTypeName.TRAFFIC_AREA);
+			semantics = new SemanticsType("TrafficArea");
 			marshalTrafficArea((TrafficArea)cityObject, semantics);
 		} else if (cityObject instanceof AuxiliaryTrafficArea) {
-			semantics = new SemanticsType(SemanticsTypeName.AUXILIARY_TRAFFIC_AREA);
+			semantics = new SemanticsType("AuxiliaryTrafficArea");
 			marshalAuxiliaryTrafficArea((AuxiliaryTrafficArea)cityObject, semantics);
 		}
 

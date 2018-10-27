@@ -23,20 +23,14 @@ import org.citygml4j.binding.cityjson.geometry.GeometryTypeName;
 import com.google.gson.annotations.JsonAdapter;
 
 public class GenericCityObjectType extends AbstractCityObjectType {
-	private final CityObjectTypeName type = CityObjectTypeName.GENERIC_CITY_OBJECT;
 	@JsonAdapter(AttributesAdapter.class)
 	private Attributes attributes;
-	
-	GenericCityObjectType() {
+
+	public GenericCityObjectType() {
 	}
 	
 	public GenericCityObjectType(String gmlId) {
 		super(gmlId);
-	}
-	
-	@Override
-	public CityObjectTypeName getType() {
-		return type;
 	}
 	
 	@Override

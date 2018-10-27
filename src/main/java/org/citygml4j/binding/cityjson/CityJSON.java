@@ -30,6 +30,7 @@ import org.citygml4j.binding.cityjson.geometry.TransformType;
 import org.citygml4j.binding.cityjson.geometry.VerticesList;
 import org.citygml4j.binding.cityjson.metadata.LoDType;
 import org.citygml4j.binding.cityjson.metadata.MetadataType;
+import org.citygml4j.model.citygml.ade.ADEException;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,12 +38,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class CityJSON {
 	private final String type = "CityJSON";
 	private final String version = "0.8";
 	private MetadataType metadata;
+	private Map<String, String> extensions;
 	@SerializedName("CityObjects")
 	@JsonAdapter(CityObjectsAdapter.class)
 	private Map<String, AbstractCityObjectType> cityObjects = new HashMap<>();
@@ -79,12 +82,42 @@ public class CityJSON {
 	public void unsetMetadata() {
 		metadata = null;
 	}
-	
+
+	public boolean hasExtensions() {
+		return extensions != null && !extensions.isEmpty();
+	}
+
+	public void addExtension(String type, String uri) throws ADEException {
+		if (!type.startsWith("+"))
+			throw new ADEException("The CityJSON extension type '" + type + " must start with a '+'.");
+
+		if (extensions == null)
+			extensions = new HashMap<>();
+
+		extensions.put(type, uri);
+	}
+
+	public Map<String, String> getExtensions() {
+		return extensions;
+	}
+
+	public void setExtensions(Map<String, String> extensions) {
+		if (extensions != null && !extensions.isEmpty())
+			this.extensions = extensions;
+	}
+
+	public void unsetExtensions() {
+		extensions = null;
+	}
+
 	public boolean hasCityObjects() {
 		return !cityObjects.isEmpty();
 	}
 	
 	public void addCityObject(AbstractCityObjectType cityObject) {
+		if (!cityObject.isSetGmlId())
+			cityObject.setGmlId("UUID_" + UUID.randomUUID().toString());
+
 		cityObjects.put(cityObject.getGmlId(), cityObject);
 	}
 	

@@ -32,6 +32,7 @@ import org.citygml4j.binding.cityjson.feature.TINReliefType;
 import org.citygml4j.binding.cityjson.feature.TunnelType;
 import org.citygml4j.binding.cityjson.feature.WaterBodyType;
 import org.citygml4j.binding.cityjson.geometry.AbstractSemanticsObject;
+import org.citygml4j.binding.cityjson.geometry.SemanticsType;
 import org.citygml4j.builder.cityjson.unmarshal.CityJSONUnmarshaller;
 import org.citygml4j.builder.cityjson.unmarshal.citygml.appearance.AppearanceUnmarshaller;
 import org.citygml4j.builder.cityjson.unmarshal.citygml.bridge.BridgeUnmarshaller;
@@ -132,6 +133,21 @@ public class CityGMLUnmarshaller {
 			tun.unmarshalSemantics(src, surfaces, lod, parent);
 		else if (parent instanceof WaterBodyModuleComponent)
 			wtr.unmarshalSemantics(src, surfaces, lod, parent);
+
+		else {
+			for (int i = 0; i < src.getNumSurfaces(); i++) {
+				SemanticsType semanticsType = src.getSurfaces().get(i);
+				if (semanticsType == null)
+					continue;
+
+				List<AbstractSurface> tmp = surfaces.get(i);
+				if (tmp == null || tmp.isEmpty())
+					continue;
+
+				if (semanticsType.getType().startsWith("+"))
+					json.getADEUnmarshaller().unmarshalSemanticSurface(semanticsType, tmp, lod, parent);
+			}
+		}
 	}
 	
 	public AppearanceUnmarshaller getAppearanceUnmarshaller() {

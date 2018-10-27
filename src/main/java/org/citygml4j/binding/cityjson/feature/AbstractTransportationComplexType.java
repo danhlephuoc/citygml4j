@@ -25,8 +25,8 @@ import com.google.gson.annotations.JsonAdapter;
 public abstract class AbstractTransportationComplexType extends AbstractCityObjectType {
 	@JsonAdapter(TransportationComplexAttributesAdapter.class)
 	private TransportationComplexAttributes attributes;
-	
-	AbstractTransportationComplexType() {
+
+	public AbstractTransportationComplexType() {
 	}
 
 	public AbstractTransportationComplexType(String gmlId) {

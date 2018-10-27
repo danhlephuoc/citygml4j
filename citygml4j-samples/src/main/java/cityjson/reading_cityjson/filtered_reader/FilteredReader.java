@@ -18,13 +18,8 @@
  */
 package cityjson.reading_cityjson.filtered_reader;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.citygml4j.CityGMLContext;
 import org.citygml4j.binding.cityjson.feature.CityObjectTypeFilter;
-import org.citygml4j.binding.cityjson.feature.CityObjectTypeName;
 import org.citygml4j.builder.cityjson.CityJSONBuilder;
 import org.citygml4j.builder.cityjson.json.io.reader.CityJSONInputFactory;
 import org.citygml4j.builder.cityjson.json.io.reader.CityJSONReader;
@@ -32,6 +27,10 @@ import org.citygml4j.model.citygml.core.AbstractCityObject;
 import org.citygml4j.model.citygml.core.CityModel;
 import org.citygml4j.model.citygml.core.CityObjectMember;
 import org.citygml4j.model.citygml.core.LodRepresentation;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class FilteredReader {
 
@@ -48,12 +47,9 @@ public class FilteredReader {
 		CityJSONReader reader = in.createCityJSONReader(new File("datasets/LOD3_Railway.json"));
 		reader = in.createFilteredCityJSONReader(reader, new CityObjectTypeFilter() {
 
-			// return true if you want to consume the CityJSON feature
-			// of the given "type" 
+			// return true if you want to consume the CityJSON feature of the given "type"
 			public boolean accept(String type) {
-				// CityObjectTypeName is an enum of the predefined "type" values in CityJSON
-				// but any other String can be used as well
-				return type.equals(CityObjectTypeName.CITY_FURNITURE.getValue());
+				return type.equals("CityFurniture");
 			}
 		});
 

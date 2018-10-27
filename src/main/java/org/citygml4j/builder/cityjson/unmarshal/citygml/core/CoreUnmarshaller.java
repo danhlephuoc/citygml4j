@@ -19,6 +19,7 @@
 package org.citygml4j.builder.cityjson.unmarshal.citygml.core;
 
 import org.citygml4j.binding.cityjson.CityJSON;
+import org.citygml4j.binding.cityjson.CityJSONRegistry;
 import org.citygml4j.binding.cityjson.feature.AbstractCityObjectType;
 import org.citygml4j.binding.cityjson.feature.AddressType;
 import org.citygml4j.binding.cityjson.feature.Attributes;
@@ -76,6 +77,7 @@ import org.citygml4j.util.walker.GeometryWalker;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -129,18 +131,31 @@ public class CoreUnmarshaller {
 
 			if (attributes.isSetGenericAttributes())
 				citygml.getGenericsUnmarshaller().unmarshalGenericAttributes(attributes, dest);
+
+			if (attributes.isSetGenericApplicationProperties()) {
+				CityJSONRegistry registry = CityJSONRegistry.getInstance();
+				for (Map.Entry<String, Object> property : attributes.getGenericApplicationProperties().entrySet()) {
+					Class<?> propertyClass = registry.getGenericApplicationPropertyClass(property.getKey(), src.getType());
+					if (propertyClass != null && propertyClass.isInstance(property.getValue()))
+						json.getADEUnmarshaller().unmarshalGenericApplicationProperty(property.getKey(), property.getValue(), src.getType(), dest);
+				}
+			}
 		}
 	}
 	
 	public void unmarshalCityModel(CityJSON src, CityModel dest) {
 		boolean hasGroups = false;
-		for (AbstractCityObjectType type : src.getCityObjects()) {	
-			AbstractCityObject cityObject = citygml.unmarshal(type, src);
-			if (cityObject != null) {
-				dest.addCityObjectMember(new CityObjectMember(cityObject));
+		for (AbstractCityObjectType type : src.getCityObjects()) {
 
-				if (cityObject instanceof CityObjectGroup)
-					hasGroups = true;
+			if (type.getType().startsWith("+")) {
+				json.getADEUnmarshaller().unmarshalCityObject(type, src, dest);
+			} else {
+				AbstractCityObject cityObject = citygml.unmarshal(type, src);
+				if (cityObject != null) {
+					dest.addCityObjectMember(new CityObjectMember(cityObject));
+					if (cityObject instanceof CityObjectGroup)
+						hasGroups = true;
+				}
 			}
 		}
 

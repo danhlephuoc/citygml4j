@@ -106,48 +106,50 @@ public class BridgeUnmarshaller {
 			if (tmp == null || tmp.isEmpty())
 				continue;
 
-			AbstractCityObject cityObject = null;
-			switch (semanticsType.getType()) {
-			case ROOF_SURFACE:
-				cityObject = unmarshalRoofSurface(semanticsType, tmp, lod);
-				break;
-			case GROUND_SURFACE:
-				cityObject = unmarshalGroundSurface(semanticsType, tmp, lod);
-				break;
-			case WALL_SURFACE:
-				cityObject = unmarshalWallSurface(semanticsType, tmp, lod);
-				break;
-			case CLOSURE_SURFACE:
-				cityObject = unmarshalClosureSurface(semanticsType, tmp, lod);
-				break;
-			case OUTER_CEILING_SURFACE:
-				cityObject = unmarshalOuterCeilingSurface(semanticsType, tmp, lod);
-				break;
-			case OUTER_FLOOR_SURFACE:
-				cityObject = unmarshalOuterFloorSurface(semanticsType, tmp, lod);
-				break;
-			case WINDOW:
-				cityObject = unmarshalWindow(semanticsType, tmp, lod);
-				break;
-			case DOOR:
-				cityObject = unmarshalDoor(semanticsType, tmp, lod);
-				break;
-			default:
-				continue;
-			}
+			if (semanticsType.getType().startsWith("+")) {
+				json.getADEUnmarshaller().unmarshalSemanticSurface(semanticsType, tmp, lod, parent);
+			} else {
+				AbstractCityObject cityObject = null;
+				switch (semanticsType.getType()) {
+					case "RoofSurface":
+						cityObject = unmarshalRoofSurface(semanticsType, tmp, lod);
+						break;
+					case "GroundSurface":
+						cityObject = unmarshalGroundSurface(semanticsType, tmp, lod);
+						break;
+					case "WallSurface":
+						cityObject = unmarshalWallSurface(semanticsType, tmp, lod);
+						break;
+					case "ClosureSurface":
+						cityObject = unmarshalClosureSurface(semanticsType, tmp, lod);
+						break;
+					case "OuterCeilingSurface":
+						cityObject = unmarshalOuterCeilingSurface(semanticsType, tmp, lod);
+						break;
+					case "OuterFloorSurface":
+						cityObject = unmarshalOuterFloorSurface(semanticsType, tmp, lod);
+						break;
+					case "Window":
+						cityObject = unmarshalWindow(semanticsType, tmp, lod);
+						break;
+					case "Door":
+						cityObject = unmarshalDoor(semanticsType, tmp, lod);
+						break;
+					default:
+						continue;
+				}
 
-			if (cityObject instanceof AbstractBoundarySurface) {
-				boundarySurface = (AbstractBoundarySurface)cityObject;
+				if (cityObject instanceof AbstractBoundarySurface) {
+					boundarySurface = (AbstractBoundarySurface) cityObject;
 
-				if (parent instanceof AbstractBridge)
-					((AbstractBridge)parent).addBoundedBySurface(new BoundarySurfaceProperty(boundarySurface));
-				else if (parent instanceof BridgeInstallation)
-					((BridgeInstallation)parent).addBoundedBySurface(new BoundarySurfaceProperty(boundarySurface));
-			}
-
-			else if (cityObject instanceof AbstractOpening && boundarySurface != null) {
-				// we need a boundary surface to assign the opening to
-				boundarySurface.addOpening(new OpeningProperty((AbstractOpening)cityObject));
+					if (parent instanceof AbstractBridge)
+						((AbstractBridge) parent).addBoundedBySurface(new BoundarySurfaceProperty(boundarySurface));
+					else if (parent instanceof BridgeInstallation)
+						((BridgeInstallation) parent).addBoundedBySurface(new BoundarySurfaceProperty(boundarySurface));
+				} else if (cityObject instanceof AbstractOpening && boundarySurface != null) {
+					// we need a boundary surface to assign the opening to
+					boundarySurface.addOpening(new OpeningProperty((AbstractOpening) cityObject));
+				}
 			}
 		}
 	}
@@ -226,7 +228,9 @@ public class BridgeUnmarshaller {
 			for (String gmlId : src.getChildren()) {
 				AbstractCityObjectType cityObject = cityJSON.getCityObject(gmlId);
 
-				if (cityObject instanceof BridgeInstallationType) {
+				if (cityObject.getType().startsWith("+")) {
+					json.getADEUnmarshaller().unmarshalCityObject(cityObject, cityJSON, dest);
+				} else if (cityObject instanceof BridgeInstallationType) {
 					BridgeInstallation installation = unmarshalBridgeInstallation((BridgeInstallationType) cityObject, cityJSON);
 					dest.addOuterBridgeInstallation(new BridgeInstallationProperty(installation));
 				} else if (cityObject instanceof  BridgeConstructionElementType) {
